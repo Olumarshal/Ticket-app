@@ -1,5 +1,8 @@
-import { ValidationError, FieldValidationError as ExpressFieldValidationError } from "express-validator";
-import { CustomError } from "./custom-error";
+import {
+  ValidationError,
+  FieldValidationError as ExpressFieldValidationError,
+} from 'express-validator';
+import { CustomError } from './custom-error';
 
 // Define an interface for the common properties
 interface CommonErrorProperties {
@@ -27,7 +30,7 @@ export class RequestValidationError extends CustomError {
 
   serializeErrors() {
     const formattedErrors = this.errors.map((error) => {
-      if (error.type === "field") {
+      if (error.type === 'field') {
         const fieldError = error as FieldValidationError;
         return { message: fieldError.msg, field: fieldError.path };
       }
