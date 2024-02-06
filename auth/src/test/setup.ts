@@ -1,11 +1,23 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import request from 'supertest';
 import { app } from '../app';
 
+declare global {
+  namespace NodeJS {
+    interface Global {
+      signin(): Promise<string[]>;
+    }
+  }
+}
+
 let mongo: any;
+
 beforeAll(async () => {
-  mongo = new MongoMemoryServer();
-  const mongoUri = await mongo.getUri();
+  process.env.JWT_KEY = 'Jl5ivFPelqLHXUFv';
+
+  mongo = await MongoMemoryServer.create();
+  const mongoUri = mongo.getUri();
 
   await mongoose.connect(mongoUri);
 });
@@ -19,6 +31,25 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-    await mongo.stop();
-    await mongoose.connection.close();
+  await mongo.stop();
+  await mongoose.connection.close();
 });
+
+const globalAny: any = global;
+
+globalAny.signin = async (): Promise<string[]> => {
+  const email = 'test@test.com';
+  const password = 'password';
+
+  const response = await request(app)
+    .post('/api/users/signup')
+    .send({
+      email,
+      password,
+    })
+    .expect(201);
+
+  const cookie = response.get('Set-Cookie');
+
+  return cookie;
+};
