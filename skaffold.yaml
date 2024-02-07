@@ -12,4 +12,8 @@ build:
       context: auth
       docker:
         dockerfile: Dockerfile
+    - image: olmarsh/client
+      context: client
+      docker:
+        dockerfile: Dockerfile
         
